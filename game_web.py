@@ -1,198 +1,19 @@
 from flask import Flask, request, redirect
 from uuid import uuid4
 
+# Import the map and room classes
+import maps_rooms as mr
+
 app = Flask(__name__)
 
 user_state = {}
 
+# This is the filepath for the map that will be loaded
+MAP_FILE_PATH = "default_map.json"
 
 def make_map():
-    return {
-        "main_hall": {
-            "pretty": "Entrance",
-            "description": """
-                <p>
-                    You're in self isolation. You've started showing some symptoms of illness including a fever and new persistent cough.  
-                </p>
-                <p>
-                    Your goal is to work out if you have COVID-19 and to survive self-isolation.
-                </p>
-               <p>
-                    On your left is a is a bathroom. On your right is a door, and ahead of you is a staircase...
-                </p>       
-                <p>
-                    What do you do?
-                </p>
-
-            """,
-            "directions": {
-                "Go to the bathroom": "bathroom",
-                "Go through the doors on your right": "living_room",
-                "Ascend the staircase": "staircase",
-            },
-            "items": []
-        },
-
-
-        "bathroom": {
-            "pretty": "Bathroom",
-            "description": """
-                <p> 
-                    You chose to go to the bathroom.
-                </p>
-                <p>
-                    You wash your hands for at least 20 seconds. Did you know that this recommended time is to allow the lipids of the virus to be destroyed?
-                </p>
-                <p>
-                    You also found some hand sanitiser, nice. Put it in your bag for later.
-                </p>
-            """,
-            "directions": {
-                "Back to the hall": "main_hall",
-            },
-            "items": ["Hand sanitiser"]
-        },
-
-
-        "living_room": {
-            "pretty": "Living Room",
-            "description": """
-                <p>
-                    You chose to go through the doors on your right...
-                </p>
-                <p>
-                    "You can't come in unless you've washed your hands." you hear.
-                </p>
-                <p>
-                    "It's fine, I've washed them and I even have hand sanitiser"
-                </p>
-                <p>
-                    "OK fine"
-                </p>
-                 <p>
-                    The door swings open.
-                </p>
-                <p>
-                    On the wall opposite you are several <b>shelves</b>.
-                    On your right there is a large <b>wardrobe</b>.
-                    On your left is a <b>corridor</b> leading down into darkness.
-                </p>
-            """,
-            "directions": {
-                "Go back": "main_hall",
-                "Explore the shelves": "shelves",
-                "Try and open the wardrobe": "wardrobe",
-                "Head down the corridor": "tbc",
-            },
-            "items": []
-        },
-
-
-        "staircase": {
-            "pretty": "NJRKESLNJNZINZILFNRJS nooooooo NJRKLESNGKJLSNLKSJGNS",
-            "description": """
-                <p style = 'color: red'>
-                    The house is not structurally sound, the staircase collapses and <br>YOU DIE</br>.
-                </p>
-                <p>
-                    Not to worry, the powers that be have decided to revive you and give you one more chance.
-                </p>
-            """,
-            "directions": {
-            },
-            "items": []
-        },
-
-        "door_handle":{
-            "pretty": "Door is blocked",
-            "description": """
-                <p>
-                    You try to go through the doors on your right...
-                </p>
-                <p>
-                    "You can't come in unless you've washed your hands." you hear.
-                </p>
-                <p>
-                    You haven't washed your hands yet and must go back.
-                </p>
-            """,
-            "directions": {
-                "Go back": "main_hall",
-            },
-            "items": []
-        },
-
-        "shelves":{
-            "pretty": "These shelves are dusty...",
-            "description": """
-                <p>
-                    The shelves contain nothing but a key and a screwdriver, which you put in your bag.
-                </p>
-               """,
-            "directions": {
-                "Continue exploring the room": "living_room",
-            },
-            "items": ["Key", "Screwdriver"]
-        },
-
-        "locked": {
-            "pretty": "Damn it's locked",
-            "description": """
-            <p>
-                You try and open the wardrobe but it is locked. Where could the key be?
-            </p>
-           """,
-            "directions": {
-                "Go back": "living_room",
-            },
-            "items": []
-        },
-
-        "wardrobe": {
-            "pretty": "Wardrobe",
-            "description": """
-            <p>
-                You try and open the wardrobe which is locked. You try the key from the shelf, which works.
-            <p>
-            <p>
-                You find a thermometer.
-            </p>
-           """,
-            "directions": {
-                "Take temperature": "temperature",
-                "Go back": "living_room"
-            },
-            "items": ["Thermometer"]
-        },
-
-        "temperature": {
-            "pretty": "You take your temperature",
-            "description": """
-                    <p>
-                        Uh oh, looks like your temperature is over 38.7 degrees...
-                    </p>
-                   """,
-            "directions": {
-                "Go back": "living_room",
-            },
-            "items": []
-        },
-
-        "tbc": {
-            "pretty": "To be continued...",
-            "description": """
-                <p>
-                    I haven't done any further than this. Watch this space.
-                </p>
-               """,
-            "directions": {
-                "Go back": "living_room",
-            },
-            "items": []
-        }
-
-    }
-
+    map = mr.Map(MAP_FILE_PATH)
+    return map
 
 def add_user():
     user_id = str(uuid4())
@@ -202,6 +23,7 @@ def add_user():
         # leads to, what items the location contains, etc
         # We store it on the player as they can modify it (eg, take an item and
         # put it in their inventory)
+        # The Map object holds a collection of Rooms and a few other things inside it. See maps_rooms.py.
         "map": make_map(),
 
         # the current location in the map
@@ -232,9 +54,9 @@ def user_not_found():
 def format_location_directions(user_id, user):
     directions = ""
 
-    current_location = user["map"][user["location"]]
+    current_location = user["map"].get_rooms()[user["location"]]
 
-    for direction, destination in current_location["directions"].items():
+    for direction, destination in current_location.get_specs()["directions"].items():
         directions += "<div>"
 
         directions += "<a href='/game/{user_id}/{direction}' style = 'color: #AEE5E8'>{direction}</a>".format(
@@ -309,10 +131,10 @@ def move_left(user_id, direction):
 
     user = user_state[user_id]
 
-    location = user["map"][user["location"]]
+    location = user["map"].get_rooms()[user["location"]]
 
-    if direction in location["directions"]:
-        user["location"] = location["directions"][direction]
+    if direction in location.get_specs()["directions"]:
+        user["location"] = location.get_specs()["directions"][direction]
 
     if user["location"] == "living_room":
         return door_handle(user_id)
@@ -331,12 +153,12 @@ def game_screen(user_id):
 
     user = user_state[user_id]
 
-    location = user["map"][user["location"]]
-    location_pretty = location["pretty"]
+    location = user["map"].get_rooms()[user["location"]]
+    location_pretty = location.get_specs()["pretty"]
 
-    location_description = location["description"]
+    location_description = location.get_specs()["description"]
 
-    new_items = location["items"]
+    new_items = location.get_specs()["items"]
 
     location_directions = format_location_directions(user_id, user)
     inventory = format_inventory(new_items, user["inventory"])
@@ -360,14 +182,14 @@ def game_screen(user_id):
         <body>
             <div class = 'main'>
             <h1>{location}</h1>
-            {location_description}
+            <p>{location_description}</p>
 
             <hr />
-            {location_directions}
+            <p>{location_directions}</p>
             </hr />
 
             <h2>Your bag contains:</h2>
-            {inventory}
+            <p>{inventory}</p>
 
             <hr />
             <a href="/" style = 'color: gray'>Start new game</a>
