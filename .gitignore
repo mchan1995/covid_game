@@ -1,0 +1,5 @@
+# This is a mac thing
+.DS_Store
+
+# This doesn't need to be shared
+__pychache__

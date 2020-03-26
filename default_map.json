@@ -1,0 +1,115 @@
+{
+    "main_hall": {
+        "pretty": "Entrance",
+        "description": [ "You're in self isolation. You've started showing some symptoms of illness including a fever and new persistent cough.",
+                        "Your goal is to work out if you have COVID-19 and to survive self-isolation.",
+                        "On your left is a is a bathroom. On your right is a door, and ahead of you is a staircase...",
+                        "What do you do?" ],
+        "directions": {
+            "Go to the bathroom": "bathroom",
+            "Go through the doors on your right": "living_room",
+            "Ascend the staircase": "staircase"
+        },
+        "items": []
+    },
+
+    "bathroom": {
+        "pretty": "Bathroom",
+        "description": [ "You chose to go to the bathroom.",
+                        "You wash your hands for at least 20 seconds. Did you know that this recommended time is to allow the lipids of the virus to be destroyed?",
+                        "You also found some hand sanitiser, nice. Put it in your bag for later." ],
+        "directions": {
+            "Back to the hall": "main_hall"
+        },
+        "items": ["Hand sanitiser"]
+    },
+
+    "living_room": {
+        "pretty": "Living Room",
+        "description": [ "You chose to go through the doors on your right...",
+                        "\"You can't come in unless you've washed your hands.\" you hear.",
+                        "\"It's fine, I've washed them and I even have hand sanitiser\"",
+                        "\"OK fine\"",
+                        "The door swings open.",
+                        "On the wall opposite you are several <b>shelves</b>.",
+                        "On your right there is a large <b>wardrobe</b>.",
+                        "On your left is a <b>corridor</b> leading down into darkness." ],
+        "directions": {
+            "Go back": "main_hall",
+            "Explore the shelves": "shelves",
+            "Try and open the wardrobe": "wardrobe",
+            "Head down the corridor": "tbc"
+        },
+        "items": []
+    },
+
+
+    "staircase": {
+        "pretty": "NJRKESLNJNZINZILFNRJS nooooooo NJRKLESNGKJLSNLKSJGNS",
+        "description": [ "The house is not structurally sound, the staircase collapses and <br>YOU DIE</br>.",
+                        "Not to worry, the powers that be have decided to revive you and give you one more chance."
+        ],
+        "directions": {
+        },
+        "items": []
+    },
+
+    "door_handle":{
+        "pretty": "Door is blocked",
+        "description": [ "You try to go through the doors on your right...",
+                        "\"You can't come in unless you've washed your hands.\" you hear.",
+                        "You haven't washed your hands yet and must go back." ],
+        "directions": {
+            "Go back": "main_hall"
+        },
+        "items": []
+    },
+
+    "shelves":{
+        "pretty": "These shelves are dusty...",
+        "description":[ "The shelves contain nothing but a key and a screwdriver, which you put in your bag." ],
+        "directions": {
+            "Continue exploring the room": "living_room"
+        },
+        "items": ["Key", "Screwdriver"]
+    },
+
+    "locked": {
+        "pretty": "Damn it's locked",
+        "description": [ "You try and open the wardrobe but it is locked. Where could the key be? "],
+        "directions": {
+            "Go back": "living_room"
+        },
+        "items": []
+    },
+
+    "wardrobe": {
+        "pretty": "Wardrobe",
+        "description": [ "You try and open the wardrobe which is locked. You try the key from the shelf, which works.",
+                        "You find a thermometer." ],
+        "directions": {
+            "Take temperature": "temperature",
+            "Go back": "living_room"
+        },
+        "items": ["Thermometer"]
+    },
+
+    "temperature": {
+        "pretty": "You take your temperature",
+        "description": [ "Uh oh, looks like your temperature is over 38.7 degrees..." ],
+        "directions": {
+            "Go back": "living_room"
+        },
+        "items": []
+    },
+
+    "tbc": {
+        "pretty": "To be continued...",
+        "description": [ "I haven't done any further than this. Watch this space." ],
+        "directions": {
+            "Go back": "living_room"
+        },
+        "items": []
+    }
+
+}
